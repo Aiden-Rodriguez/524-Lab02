@@ -26,14 +26,11 @@
         "globalVariables": []
       }
     },
-    "deletedPous": [],
     "debugVariables": {
       "pous": {
         "main": [
-          "Green",
-          "Yellow",
-          "Red",
           "GreenOn",
+          "AllLightsOff",
           "YellowOn",
           "RedOn",
           "GreenTimer",
@@ -41,6 +38,7 @@
           "RedTimer"
         ]
       }
-    }
+    },
+    "deletedPous": []
   }
 }

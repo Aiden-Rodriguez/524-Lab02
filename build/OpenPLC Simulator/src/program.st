@@ -1,17 +1,20 @@
 PROGRAM main
   VAR
-    Green : BOOL := FALSE;
-    Yellow : BOOL := FALSE;
-    Red : BOOL := FALSE;
     GreenOn : BOOL := True;
+    AllLightsOff : BOOL := False;
     YellowOn : BOOL := False;
     RedOn : BOOL := False;
     GreenTimer : TON;
     YellowTimer : TON;
     RedTimer : TON;
+    _TMP_OR2782429_OUT : BOOL;
   END_VAR
 
-  GreenTimer(IN := GreenOn, PT := T#10s);
+  IF NOT(RedOn) AND NOT(YellowOn) AND NOT(GreenOn) THEN
+    AllLightsOff := TRUE; (*set*)
+  END_IF;
+  _TMP_OR2782429_OUT := OR(GreenOn, AllLightsOff);
+  GreenTimer(IN := _TMP_OR2782429_OUT, PT := T#10s);
   IF GreenTimer.Q THEN
     GreenOn := FALSE; (*reset*)
   END_IF;
@@ -43,7 +46,7 @@ CONFIGURATION Config0
   END_RESOURCE
 END_CONFIGURATION
 
-(*DBG:char md5[] = "b4d75b3a78bcb2811af106fe87b778ac";*)
+(*DBG:char md5[] = "bc8259e937265296ef6a312b168ed554";*)
 (*DBG:/**)
 (*DBG: * This file is part of OpenPLC Runtime*)
 (*DBG: **)
@@ -79,7 +82,7 @@ END_CONFIGURATION
 (*DBG:#define SAME_ENDIANNESS      0*)
 (*DBG:#define REVERSE_ENDIANNESS   1*)
 (*DBG:*)
-(*DBG:char plc_program_md5[] = "b4d75b3a78bcb2811af106fe87b778ac";*)
+(*DBG:char plc_program_md5[] = "bc8259e937265296ef6a312b168ed554";*)
 (*DBG:*)
 (*DBG:uint8_t endianness;*)
 (*DBG:*)
@@ -90,10 +93,8 @@ END_CONFIGURATION
 (*DBG:    void *ptr;*)
 (*DBG:    __IEC_types_enum type;*)
 (*DBG:} debug_vars[] = {*)
-(*DBG:    {&(RES0__INSTANCE0.GREEN), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.YELLOW), BOOL_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0.RED), BOOL_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.GREENON), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.ALLLIGHTSOFF), BOOL_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.YELLOWON), BOOL_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.REDON), BOOL_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.GREENTIMER.EN), BOOL_ENUM},*)
@@ -126,9 +127,10 @@ END_CONFIGURATION
 (*DBG:    {&(RES0__INSTANCE0.REDTIMER.PREV_IN), BOOL_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.REDTIMER.CURRENT_TIME), TIME_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.REDTIMER.START_TIME), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0._TMP_OR2782429_OUT), BOOL_ENUM},*)
 (*DBG:};*)
 (*DBG:*)
-(*DBG:#define VAR_COUNT               36*)
+(*DBG:#define VAR_COUNT               35*)
 (*DBG:*)
 (*DBG:uint16_t get_var_count(void)*)
 (*DBG:{*)
@@ -144,10 +146,10 @@ END_CONFIGURATION
 (*DBG:    switch (debug_vars[idx].type) {*)
 (*DBG:    case TIME_ENUM:*)
 (*DBG:        return sizeof(TIME);*)
-(*DBG:    case BOOL_ENUM:*)
-(*DBG:        return sizeof(BOOL);*)
 (*DBG:    case SINT_ENUM:*)
 (*DBG:        return sizeof(SINT);*)
+(*DBG:    case BOOL_ENUM:*)
+(*DBG:        return sizeof(BOOL);*)
 (*DBG:    default:*)
 (*DBG:        return 0;*)
 (*DBG:    }*)
@@ -160,10 +162,10 @@ END_CONFIGURATION
 (*DBG:    switch (debug_vars[idx].type) {*)
 (*DBG:    case TIME_ENUM:*)
 (*DBG:        return (void *)&((__IEC_TIME_t *) ptr)->value;*)
-(*DBG:    case BOOL_ENUM:*)
-(*DBG:        return (void *)&((__IEC_BOOL_t *) ptr)->value;*)
 (*DBG:    case SINT_ENUM:*)
 (*DBG:        return (void *)&((__IEC_SINT_t *) ptr)->value;*)
+(*DBG:    case BOOL_ENUM:*)
+(*DBG:        return (void *)&((__IEC_BOOL_t *) ptr)->value;*)
 (*DBG:    default:*)
 (*DBG:        return 0;*)
 (*DBG:    }*)
@@ -182,15 +184,15 @@ END_CONFIGURATION
 (*DBG:            break;*)
 (*DBG:        }*)
 (*DBG:    *)
-(*DBG:        case BOOL_ENUM: {*)
-(*DBG:            memcpy(&((__IEC_BOOL_t *) ptr)->value, val, var_size);*)
-(*DBG:            ((__IEC_BOOL_t *) ptr)->flags |= __IEC_FORCE_FLAG;*)
-(*DBG:            break;*)
-(*DBG:        }*)
-(*DBG:    *)
 (*DBG:        case SINT_ENUM: {*)
 (*DBG:            memcpy(&((__IEC_SINT_t *) ptr)->value, val, var_size);*)
 (*DBG:            ((__IEC_SINT_t *) ptr)->flags |= __IEC_FORCE_FLAG;*)
+(*DBG:            break;*)
+(*DBG:        }*)
+(*DBG:    *)
+(*DBG:        case BOOL_ENUM: {*)
+(*DBG:            memcpy(&((__IEC_BOOL_t *) ptr)->value, val, var_size);*)
+(*DBG:            ((__IEC_BOOL_t *) ptr)->flags |= __IEC_FORCE_FLAG;*)
 (*DBG:            break;*)
 (*DBG:        }*)
 (*DBG:    *)
@@ -202,11 +204,11 @@ END_CONFIGURATION
 (*DBG:        case TIME_ENUM:*)
 (*DBG:            ((__IEC_TIME_t *) ptr)->flags &= ~__IEC_FORCE_FLAG;*)
 (*DBG:            break;*)
-(*DBG:        case BOOL_ENUM:*)
-(*DBG:            ((__IEC_BOOL_t *) ptr)->flags &= ~__IEC_FORCE_FLAG;*)
-(*DBG:            break;*)
 (*DBG:        case SINT_ENUM:*)
 (*DBG:            ((__IEC_SINT_t *) ptr)->flags &= ~__IEC_FORCE_FLAG;*)
+(*DBG:            break;*)
+(*DBG:        case BOOL_ENUM:*)
+(*DBG:            ((__IEC_BOOL_t *) ptr)->flags &= ~__IEC_FORCE_FLAG;*)
 (*DBG:            break;*)
 (*DBG:        default:*)
 (*DBG:            break;*)
