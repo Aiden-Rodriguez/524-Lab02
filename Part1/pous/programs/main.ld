@@ -2073,7 +2073,8 @@ END_VAR
               "location": "",
               "initialValue": "False",
               "documentation": "",
-              "debug": true
+              "debug": false,
+              "id": "broken-VARIABLE_85f83293-5778-4feb-a254-ce0d67e2fbde"
             },
             "executionOrder": 0,
             "variant": "input",
@@ -2091,7 +2092,8 @@ END_VAR
             },
             "draggable": false,
             "selectable": true,
-            "deletable": false
+            "deletable": false,
+            "wrongVariable": true
           }
         },
         {
