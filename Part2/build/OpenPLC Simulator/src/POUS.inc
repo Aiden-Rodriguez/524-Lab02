@@ -34,9 +34,8 @@ void MAIN_body__(MAIN *data__) {
   if (__GET_VAR(data__->_TMP_OR3089709_OUT,)) {
     __SET_VAR(data__->,MAINYELLOW,,__BOOL_LITERAL(TRUE));
   };
-  __SET_VAR(data__->,MAINGREEN,,!(__GET_VAR(data__->_TMP_OR3089709_OUT,)));
-  if (((!(__GET_VAR(data__->PEDWAITING,)) && !(__GET_VAR(data__->CARWAITING,))) && __GET_VAR(data__->GREENTIMER.Q,))) {
-    __SET_VAR(data__->,MAINGREEN,,__BOOL_LITERAL(TRUE));
+  if (__GET_VAR(data__->_TMP_OR3089709_OUT,)) {
+    __SET_VAR(data__->,MAINGREEN,,__BOOL_LITERAL(FALSE));
   };
   __SET_VAR(data__->YELLOWTIMER.,IN,,__GET_VAR(data__->MAINYELLOW,));
   __SET_VAR(data__->YELLOWTIMER.,PT,,__time_to_timespec(1, 0, 3, 0, 0, 0));
@@ -57,7 +56,7 @@ void MAIN_body__(MAIN *data__) {
     (BOOL)__BOOL_LITERAL(TRUE),
     NULL,
     (UINT)2,
-    (BOOL)__GET_VAR(data__->PEDWAITING,),
+    (BOOL)(__GET_VAR(data__->PEDWAITING,) && !(__GET_VAR(data__->SIDEGREEN,))),
     (BOOL)__GET_VAR(data__->CARWAITING,)));
   __SET_VAR(data__->SIDEGREENTIMER.,IN,,(__GET_VAR(data__->MAINRED,) && __GET_VAR(data__->_TMP_OR7337546_OUT,)));
   __SET_VAR(data__->SIDEGREENTIMER.,PT,,__time_to_timespec(1, 0, 10, 0, 0, 0));
@@ -84,10 +83,10 @@ void MAIN_body__(MAIN *data__) {
     __SET_VAR(data__->,SIDEYELLOW,,__BOOL_LITERAL(FALSE));
   };
   if (__GET_VAR(data__->SIDEYELLOWTIMER.Q,)) {
-    __SET_VAR(data__->,MAINGREEN,,__BOOL_LITERAL(TRUE));
+    __SET_VAR(data__->,MAINRED,,__BOOL_LITERAL(FALSE));
   };
   if (__GET_VAR(data__->SIDEYELLOWTIMER.Q,)) {
-    __SET_VAR(data__->,MAINRED,,__BOOL_LITERAL(FALSE));
+    __SET_VAR(data__->,MAINGREEN,,__BOOL_LITERAL(TRUE));
   };
 
   goto __end;
