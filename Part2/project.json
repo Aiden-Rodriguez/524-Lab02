@@ -26,7 +26,6 @@
         "globalVariables": []
       }
     },
-    "deletedPous": [],
     "debugVariables": {
       "pous": {
         "main": [
@@ -44,6 +43,7 @@
           "SideYellowTimer"
         ]
       }
-    }
+    },
+    "deletedPous": []
   }
 }

@@ -12,16 +12,24 @@ PROGRAM main
     YellowTimer : TON;
     SideGreenTimer : TON;
     SideYellowTimer : TON;
-    _TMP_OR3089709_OUT : BOOL;
+    CycleActive : BOOL := False;
+    TON0 : TON;
+    _TMP_OR2515629_OUT : BOOL;
+    _TMP_AND4218231_OUT : BOOL;
+    _TMP_OR2490653_OUT : BOOL;
     _TMP_OR7337546_OUT : BOOL;
   END_VAR
 
+  _TMP_OR2515629_OUT := OR(CarWaiting, PedWaiting);
+  _TMP_AND4218231_OUT := AND(_TMP_OR2515629_OUT, MainGreen);
+  IF _TMP_AND4218231_OUT THEN
+    CycleActive := TRUE; (*set*)
+  END_IF;
   GreenTimer(IN := MainGreen, PT := T#10s);
-  _TMP_OR3089709_OUT := OR(CarWaiting AND GreenTimer.Q, PedWaiting);
-  IF _TMP_OR3089709_OUT THEN
+  IF CycleActive AND GreenTimer.Q THEN
     MainYellow := TRUE; (*set*)
   END_IF;
-  IF _TMP_OR3089709_OUT THEN
+  IF CycleActive AND GreenTimer.Q THEN
     MainGreen := FALSE; (*reset*)
   END_IF;
   YellowTimer(IN := MainYellow, PT := T#3s);
@@ -37,21 +45,28 @@ PROGRAM main
   IF NOT(CarWaiting) AND NOT(PedWaiting) AND SideRed AND MainRed THEN
     MainRed := FALSE; (*reset*)
   END_IF;
+  IF NOT(CarWaiting) AND NOT(PedWaiting) AND SideRed AND MainRed THEN
+    CycleActive := FALSE; (*reset*)
+  END_IF;
+  _TMP_OR2490653_OUT := OR(CarWaiting AND SideRed AND MainRed, PedWaiting);
+  IF _TMP_OR2490653_OUT THEN
+    CycleActive := TRUE; (*set*)
+  END_IF;
   _TMP_OR7337546_OUT := OR(PedWaiting AND NOT(SideGreen), CarWaiting);
-  SideGreenTimer(IN := MainRed AND _TMP_OR7337546_OUT, PT := T#10s);
-  IF MainRed AND _TMP_OR7337546_OUT THEN
+  SideGreenTimer(IN := MainRed AND (SideGreen OR _TMP_OR7337546_OUT), PT := T#10s);
+  IF MainRed AND (SideGreen OR _TMP_OR7337546_OUT) THEN
     SideGreen := TRUE; (*set*)
   END_IF;
-  IF MainRed AND _TMP_OR7337546_OUT THEN
+  IF MainRed AND (SideGreen OR _TMP_OR7337546_OUT) THEN
     SideRed := FALSE; (*reset*)
   END_IF;
-  IF SideGreenTimer.Q THEN
+  IF NOT(CarWaiting) AND NOT(PedWaiting) AND SideGreenTimer.Q THEN
     SideYellow := TRUE; (*set*)
   END_IF;
-  IF SideGreenTimer.Q THEN
+  IF NOT(CarWaiting) AND NOT(PedWaiting) AND SideGreenTimer.Q THEN
     SideGreen := FALSE; (*reset*)
   END_IF;
-  SideYellowTimer(IN := SideYellow, PT := T#3s);
+  SideYellowTimer(IN := NOT(CarWaiting) AND NOT(PedWaiting) AND SideYellow, PT := T#3s);
   IF SideYellowTimer.Q THEN
     SideRed := TRUE; (*set*)
   END_IF;
@@ -75,7 +90,7 @@ CONFIGURATION Config0
   END_RESOURCE
 END_CONFIGURATION
 
-(*DBG:char md5[] = "a95356354195f2c551a9886f2adad364";*)
+(*DBG:char md5[] = "9252a56d4a6acb10a49c894885784ae2";*)
 (*DBG:/**)
 (*DBG: * This file is part of OpenPLC Runtime*)
 (*DBG: **)
@@ -111,7 +126,7 @@ END_CONFIGURATION
 (*DBG:#define SAME_ENDIANNESS      0*)
 (*DBG:#define REVERSE_ENDIANNESS   1*)
 (*DBG:*)
-(*DBG:char plc_program_md5[] = "a95356354195f2c551a9886f2adad364";*)
+(*DBG:char plc_program_md5[] = "9252a56d4a6acb10a49c894885784ae2";*)
 (*DBG:*)
 (*DBG:uint8_t endianness;*)
 (*DBG:*)
@@ -170,11 +185,24 @@ END_CONFIGURATION
 (*DBG:    {&(RES0__INSTANCE0.SIDEYELLOWTIMER.PREV_IN), BOOL_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.SIDEYELLOWTIMER.CURRENT_TIME), TIME_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0.SIDEYELLOWTIMER.START_TIME), TIME_ENUM},*)
-(*DBG:    {&(RES0__INSTANCE0._TMP_OR3089709_OUT), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.CYCLEACTIVE), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.TON0.EN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.TON0.ENO), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.TON0.IN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.TON0.PT), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.TON0.Q), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.TON0.ET), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.TON0.STATE), SINT_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.TON0.PREV_IN), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.TON0.CURRENT_TIME), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0.TON0.START_TIME), TIME_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0._TMP_OR2515629_OUT), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0._TMP_AND4218231_OUT), BOOL_ENUM},*)
+(*DBG:    {&(RES0__INSTANCE0._TMP_OR2490653_OUT), BOOL_ENUM},*)
 (*DBG:    {&(RES0__INSTANCE0._TMP_OR7337546_OUT), BOOL_ENUM},*)
 (*DBG:};*)
 (*DBG:*)
-(*DBG:#define VAR_COUNT               50*)
+(*DBG:#define VAR_COUNT               63*)
 (*DBG:*)
 (*DBG:uint16_t get_var_count(void)*)
 (*DBG:{*)
@@ -188,12 +216,12 @@ END_CONFIGURATION
 (*DBG:        return 0;*)
 (*DBG:    }*)
 (*DBG:    switch (debug_vars[idx].type) {*)
+(*DBG:    case TIME_ENUM:*)
+(*DBG:        return sizeof(TIME);*)
 (*DBG:    case SINT_ENUM:*)
 (*DBG:        return sizeof(SINT);*)
 (*DBG:    case BOOL_ENUM:*)
 (*DBG:        return sizeof(BOOL);*)
-(*DBG:    case TIME_ENUM:*)
-(*DBG:        return sizeof(TIME);*)
 (*DBG:    default:*)
 (*DBG:        return 0;*)
 (*DBG:    }*)
@@ -204,12 +232,12 @@ END_CONFIGURATION
 (*DBG:    void *ptr = debug_vars[idx].ptr;*)
 (*DBG:*)
 (*DBG:    switch (debug_vars[idx].type) {*)
+(*DBG:    case TIME_ENUM:*)
+(*DBG:        return (void *)&((__IEC_TIME_t *) ptr)->value;*)
 (*DBG:    case SINT_ENUM:*)
 (*DBG:        return (void *)&((__IEC_SINT_t *) ptr)->value;*)
 (*DBG:    case BOOL_ENUM:*)
 (*DBG:        return (void *)&((__IEC_BOOL_t *) ptr)->value;*)
-(*DBG:    case TIME_ENUM:*)
-(*DBG:        return (void *)&((__IEC_TIME_t *) ptr)->value;*)
 (*DBG:    default:*)
 (*DBG:        return 0;*)
 (*DBG:    }*)
@@ -222,6 +250,12 @@ END_CONFIGURATION
 (*DBG:    if (forced) {*)
 (*DBG:        size_t var_size = get_var_size(idx);*)
 (*DBG:        switch (debug_vars[idx].type) {*)
+(*DBG:        case TIME_ENUM: {*)
+(*DBG:            memcpy(&((__IEC_TIME_t *) ptr)->value, val, var_size);*)
+(*DBG:            ((__IEC_TIME_t *) ptr)->flags |= __IEC_FORCE_FLAG;*)
+(*DBG:            break;*)
+(*DBG:        }*)
+(*DBG:    *)
 (*DBG:        case SINT_ENUM: {*)
 (*DBG:            memcpy(&((__IEC_SINT_t *) ptr)->value, val, var_size);*)
 (*DBG:            ((__IEC_SINT_t *) ptr)->flags |= __IEC_FORCE_FLAG;*)
@@ -234,25 +268,19 @@ END_CONFIGURATION
 (*DBG:            break;*)
 (*DBG:        }*)
 (*DBG:    *)
-(*DBG:        case TIME_ENUM: {*)
-(*DBG:            memcpy(&((__IEC_TIME_t *) ptr)->value, val, var_size);*)
-(*DBG:            ((__IEC_TIME_t *) ptr)->flags |= __IEC_FORCE_FLAG;*)
-(*DBG:            break;*)
-(*DBG:        }*)
-(*DBG:    *)
 (*DBG:        default:*)
 (*DBG:            break;*)
 (*DBG:        }*)
 (*DBG:    } else {*)
 (*DBG:        switch (debug_vars[idx].type) {*)
+(*DBG:        case TIME_ENUM:*)
+(*DBG:            ((__IEC_TIME_t *) ptr)->flags &= ~__IEC_FORCE_FLAG;*)
+(*DBG:            break;*)
 (*DBG:        case SINT_ENUM:*)
 (*DBG:            ((__IEC_SINT_t *) ptr)->flags &= ~__IEC_FORCE_FLAG;*)
 (*DBG:            break;*)
 (*DBG:        case BOOL_ENUM:*)
 (*DBG:            ((__IEC_BOOL_t *) ptr)->flags &= ~__IEC_FORCE_FLAG;*)
-(*DBG:            break;*)
-(*DBG:        case TIME_ENUM:*)
-(*DBG:            ((__IEC_TIME_t *) ptr)->flags &= ~__IEC_FORCE_FLAG;*)
 (*DBG:            break;*)
 (*DBG:        default:*)
 (*DBG:            break;*)
